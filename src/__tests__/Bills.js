@@ -76,8 +76,18 @@ describe("Given I am connected as an employee", () => {
       expect(handleClickIconEye).toHaveBeenCalled()
     })
     test("Then i should load the bills",async()=>{
-      const bills = await mockStore.bills().list();
-      expect(bills.length).toBe(4);
-    });
+      const bill = mockStore.bills();
+      const spy = jest.spyOn(bill,'list')
+      const billList = await bill.list();
+      expect(spy).toBeCalled()
+      expect(billList.length).toBe(4);
+    })
+    test("Then i fail loading the bills", async()=>{
+      const billList = jest.fn(mockStore.bills().list())
+      billList.mockImplementation(()=>{
+        return Promise.reject(new Error('API error'))
+      })
+      billList().catch(error =>{expect(error).toBeDefined()})
+    })
   })
 })
